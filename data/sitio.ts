@@ -16,6 +16,9 @@ export const sitio = {
   // Vacío = la portada muestra las fotos.
   heroVideo: '/video/terreno.mp4',
   heroPoster: '/img/terreno-poster.jpg',
+  // Versión vertical y liviana para teléfonos (720×1280).
+  heroVideoMovil: '/video/terreno-movil.mp4',
+  heroPosterMovil: '/img/terreno-poster-movil.jpg',
   // Provisorio: recorrido armado con fotos del terreno. Cambiar a "Vuelo de dron sobre las parcelas" al reemplazar el video.
   heroVideoDescripcion: 'Recorrido por las praderas y arboledas del terreno',
   // ID de YouTube del recorrido (ej. 'dQw4w9WgXcQ'). Vacío = la sección de video no se muestra.

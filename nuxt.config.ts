@@ -1,3 +1,12 @@
+// Las versiones de muestra (Vercel sin el dominio nuestraparcela.cl, o vistas previas) responden con
+// el encabezado X-Robots-Tag: noindex para que Google no las indexe. Al conectar el dominio real y
+// volver a publicar, el encabezado desaparece. NOINDEX=1 fuerza el modo muestra.
+const dominioVercel = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? ''
+const esMuestra =
+  process.env.NOINDEX === '1' ||
+  process.env.VERCEL_ENV === 'preview' ||
+  (process.env.VERCEL === '1' && !dominioVercel.includes('nuestraparcela.cl'))
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   devtools: { enabled: false },
@@ -30,5 +39,6 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: true },
     '/img/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    ...(esMuestra ? { '/**': { headers: { 'x-robots-tag': 'noindex, nofollow' } } } : {}),
   },
 })

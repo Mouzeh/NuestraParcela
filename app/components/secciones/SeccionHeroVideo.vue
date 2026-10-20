@@ -1,18 +1,55 @@
 <script setup lang="ts">
 import { sitio, clp } from '~~/data/sitio'
 
-// Portada con video de dron. El video solo se carga en el navegador y no se carga
-// si la persona pidió menos movimiento o tiene activado el ahorro de datos.
+// Portada con video. En teléfonos se usa la versión vertical y liviana.
+// Se reproduce sola salvo que la persona pidió menos movimiento o ahorro de datos;
+// en ese caso, o si el navegador bloquea la reproducción automática (p. ej. modo de bajo
+// consumo del iPhone), se ve la imagen fija y el botón "Reproducir video".
 const video = ref<HTMLVideoElement>()
 const reproduciendo = ref(false)
-const cargar = ref(false)
+const montado = ref(false)
+const esMovil = ref(false)
+
+const cargarVideo = () => {
+  const v = video.value
+  if (!v || v.getAttribute('src')) return
+  v.preload = 'auto'
+  v.src = esMovil.value ? sitio.heroVideoMovil : sitio.heroVideo
+  v.load()
+  // Respaldo: si a los 2,5 s todavía no hay datos, se vuelve a pedir el archivo.
+  setTimeout(() => {
+    if (v.readyState === 0) {
+      v.load()
+      if (!v.paused || reproduciendo.value) v.play().catch(() => {})
+    }
+  }, 2500)
+}
+
+const reproducir = () => {
+  const v = video.value
+  if (!v) return
+  cargarVideo()
+  v.play().catch(() => (reproduciendo.value = false))
+}
 
 onMounted(() => {
+  const v = video.value!
+  esMovil.value = window.matchMedia('(max-width: 767px)').matches
+  // Safari en iPhone solo reproduce sin tocar si el video está silenciado y en línea,
+  // y lo revisa en las propiedades, no solo en los atributos del HTML.
+  v.muted = true
+  v.defaultMuted = true
+  v.playsInline = true
+  v.setAttribute('webkit-playsinline', '')
+  v.addEventListener('playing', () => (reproduciendo.value = true))
+  v.addEventListener('pause', () => (reproduciendo.value = false))
+  montado.value = true
+
   const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const ahorroDatos = (navigator as any).connection?.saveData === true
   if (menosMovimiento || ahorroDatos) return
-  cargar.value = true
-  nextTick(() => video.value?.play().then(() => (reproduciendo.value = true)).catch(() => {}))
+  // El video se pide un momento después de mostrar la página, para no competir con ella.
+  setTimeout(reproducir, 300)
 })
 
 const raiz = ref<HTMLElement>()
@@ -25,15 +62,7 @@ useAnimacion(raiz, ({ gsap, raiz }) => {
   gsap.to(raiz.querySelector('.marco-video'), { yPercent: 12, ease: 'none', scrollTrigger: salida })
 })
 
-const alternar = () => {
-  const v = video.value
-  if (!v) return
-  if (v.paused) v.play().then(() => (reproduciendo.value = true))
-  else {
-    v.pause()
-    reproduciendo.value = false
-  }
-}
+const alternar = () => (video.value?.paused ? reproducir() : video.value?.pause())
 </script>
 
 <template>
@@ -42,15 +71,13 @@ const alternar = () => {
       <video
         ref="video"
         class="fondo"
-        :poster="sitio.heroPoster"
+        :poster="esMovil ? sitio.heroPosterMovil : sitio.heroPoster"
         muted
         loop
         playsinline
         preload="none"
         :aria-label="sitio.heroVideoDescripcion"
-      >
-        <source v-if="cargar" :src="sitio.heroVideo" type="video/mp4" />
-      </video>
+      />
     </div>
     <div class="contenedor contenido">
       <TituloLineas etiqueta="h1" :lineas="['Media', 'hectárea']" />
@@ -61,7 +88,7 @@ const alternar = () => {
         </p>
         <div class="acciones">
           <a href="#plano" class="boton boton-papel">Elegir mi parcela</a>
-          <button v-if="cargar" class="enlace pausa" @click="alternar">{{ reproduciendo ? 'Pausar video' : 'Reproducir video' }}</button>
+          <button v-if="montado" class="enlace pausa" @click="alternar">{{ reproduciendo ? 'Pausar video' : 'Reproducir video' }}</button>
         </div>
       </div>
     </div>
