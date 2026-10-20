@@ -1,0 +1,246 @@
+:root {
+  /* Color: papel verde grisáceo, tinta de bosque, un solo acento verde (la acción). */
+  --fondo: #eceee7;
+  --superficie: #e0e4da;
+  --papel: #f6f7f2;
+  --tinta: #162019;
+  --tinta-suave: #465247;
+  --bosque: #1f3325;
+  --bosque-2: #2a4430;
+  --sobre-bosque: #e8ebe2;
+  --sobre-bosque-suave: #b9c3b4;
+  --acento: #2d5a35;
+  --acento-2: #234a2b;
+  --velo: rgba(10, 16, 11, 0.55);
+  --disponible: #6a9a58;
+  --reservada: #c99a3a;
+  --vendida: #9a9d94;
+
+  /* Tipo: una sola familia, cinco tamaños. */
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --paso-chico: 0.875rem;
+  --paso-cuerpo: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --paso-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --paso-titulo: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --paso-display: clamp(3.5rem, 13vw, 12rem);
+
+  /* Espacio */
+  --margen: clamp(20px, 6vw, 88px);
+  --ancho: 1440px;
+  --entre-secciones: clamp(96px, 13vw, 200px);
+  --facil: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--serif);
+  font-size: var(--paso-cuerpo);
+  font-optical-sizing: auto;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: var(--paso-titulo);
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: 0 var(--margen);
+}
+
+/* Un solo botón: esquinas rectas, relleno plano. */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 0;
+  background: var(--acento);
+  color: var(--papel);
+  font-size: var(--paso-cuerpo);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s, transform 0.15s var(--facil);
+}
+
+.boton:hover {
+  background: var(--acento-2);
+}
+
+.boton:active {
+  transform: scale(0.97);
+}
+
+.boton svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.boton-papel {
+  background: var(--papel);
+  color: var(--tinta);
+}
+
+.boton-papel:hover {
+  background: var(--superficie);
+}
+
+.enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  transition: text-underline-offset 0.2s var(--facil);
+}
+
+.enlace:hover {
+  text-underline-offset: 8px;
+}
+
+.enlace svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s var(--facil);
+}
+
+.enlace:hover svg {
+  transform: translateX(4px);
+}
+
+.chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip-estado::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color, var(--disponible));
+}
+
+/* Entradas (las anima GSAP): ocultas solo con JS y sin preferencia de movimiento reducido. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-revelar]:not(.visible) {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--acento);
+  color: var(--papel);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Círculo numerado de cada lote en los mapas satelitales (se inserta fuera de los componentes). */
+.etiqueta-lote {
+  display: grid;
+  place-items: center;
+  width: var(--tam-etiqueta, 30px);
+  height: var(--tam-etiqueta, 30px);
+  border-radius: 50%;
+  border: 2px solid var(--aro);
+  background: rgba(10, 16, 11, 0.35);
+  color: #fff;
+  font-family: var(--serif);
+  font-size: calc(var(--tam-etiqueta, 30px) * 0.46);
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s var(--facil), background-color 0.2s;
+}
+.etiqueta-lote:hover {
+  transform: scale(1.12);
+}
+.etiqueta-lote.activa {
+  background: var(--papel);
+  color: var(--bosque);
+  transform: scale(1.18);
+}
+.etiqueta-lote.vendida {
+  text-decoration: line-through;
+}
+/* En Leaflet el marcador mide 0×0: el círculo se centra con margen negativo. */
+.leaflet-marker-icon .etiqueta-lote {
+  margin: calc(var(--tam-etiqueta, 30px) / -2);
+}
+.leaflet-container,
+.leaflet-container .leaflet-bar a {
+  font-family: var(--serif);
+}
